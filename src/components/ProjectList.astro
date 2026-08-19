@@ -1,0 +1,86 @@
+---
+import Line from './Line.astro';
+import type { Project, Section } from '../data/projects';
+import { projects } from '../data/projects';
+
+interface Props {
+  section: Section;
+}
+
+const { section } = Astro.props;
+const items: Project[] = projects.filter((p) => p.section === section);
+---
+
+<Line cmd>ls {section}/</Line>
+
+<ul class="list">
+  {
+    items.map((p) => (
+      <li class="item" data-lens={p.lens.join(' ')}>
+        <a href={`/${p.section}/${p.slug}/`}>
+          <span class="item__mark" aria-hidden="true">
+            →
+          </span>
+          <span class="item__title">{p.title}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<p class="empty">
+  <Line comment>no matches for this lens — try `all` in the nav</Line>
+</p>
+
+<style>
+  .list {
+    list-style: none;
+    margin: 0.4em 0 1em;
+    padding: 0;
+  }
+
+  .item a {
+    display: flex;
+    gap: 1ch;
+    padding: 0.2em 0.4em;
+    margin-left: -0.4em;
+    border-radius: var(--radius);
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .item a:hover {
+    background: var(--accent-faint);
+  }
+
+  .item__mark {
+    color: var(--fg-faint);
+  }
+
+  .item a:hover .item__mark {
+    color: var(--accent);
+  }
+
+  .item__title {
+    text-decoration: underline;
+    text-decoration-color: var(--accent-faint);
+  }
+
+  /* Lens filtering is pure CSS driven by data-lens on <html>, set before paint
+     in Base.astro. No JS runs on load, so there's no flash of the full list. */
+  :global(:root[data-lens='developer']) .item:not([data-lens~='developer']),
+  :global(:root[data-lens='designer']) .item:not([data-lens~='designer']) {
+    display: none;
+  }
+
+  .empty {
+    display: none;
+    margin: 0;
+  }
+
+  /* Shown only when the active lens has hidden every single item. */
+  :global(:root[data-lens='developer']) .list:not(:has(.item[data-lens~='developer'])) + .empty,
+  :global(:root[data-lens='designer']) .list:not(:has(.item[data-lens~='designer'])) + .empty {
+    display: revert;
+  }
+</style>

@@ -1,0 +1,18 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# platform
+.vercel/
+
+# environment
+.env
+.env.*
+!.env.example
+
+# os
+.DS_Store
+Thumbs.db

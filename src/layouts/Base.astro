@@ -1,0 +1,108 @@
+---
+import '../styles/theme.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Qilmeg Doudatcz — architecture, computation, XR, heritage.' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+
+    {/*
+      Runs before first paint so a visitor who chose light doesn't get a black
+      flash on every navigation. `is:inline` keeps Astro from bundling and
+      deferring it — deferring is exactly what would cause the flash.
+    */}
+    <script is:inline>
+      (function () {
+        try {
+          var theme = localStorage.getItem('theme');
+          if (theme === 'light' || theme === 'dark') {
+            document.documentElement.dataset.theme = theme;
+          }
+          // The lens filters by CSS, so it has to be on <html> before paint or
+          // every visitor sees the full list flash before it narrows.
+          var lens = localStorage.getItem('lens');
+          if (lens === 'developer' || lens === 'designer') {
+            document.documentElement.dataset.lens = lens;
+          }
+        } catch (e) {
+          /* private mode / storage disabled — OS theme, unfiltered list */
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <button
+      type="button"
+      class="theme-toggle"
+      data-theme-toggle
+      aria-label="Switch between light and dark theme"
+    >
+      <span aria-hidden="true">◐</span>
+    </button>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <script>
+      const root = document.documentElement;
+      const toggle = document.querySelector('[data-theme-toggle]');
+
+      function current() {
+        if (root.dataset.theme) return root.dataset.theme;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      toggle?.addEventListener('click', () => {
+        const next = current() === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        try {
+          localStorage.setItem('theme', next);
+        } catch (e) {
+          /* nothing to do — the choice just won't survive a reload */
+        }
+      });
+    </script>
+
+    <style>
+      .theme-toggle {
+        position: fixed;
+        top: var(--gutter);
+        right: var(--gutter);
+        z-index: 10;
+        width: 2.25rem;
+        height: 2.25rem;
+        display: grid;
+        place-items: center;
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        color: var(--fg-muted);
+        background: var(--bg-inset);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+      }
+
+      .theme-toggle:hover {
+        color: var(--accent);
+        border-color: var(--border-strong);
+      }
+    </style>
+  </body>
+</html>

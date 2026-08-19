@@ -1,0 +1,147 @@
+---
+const path = Astro.url.pathname;
+const items = [
+  { href: '/work/', label: 'work' },
+  { href: '/research/', label: 'research' },
+  { href: '/about/', label: 'about' },
+];
+---
+
+<nav class="nav" aria-label="Primary">
+  <a class="nav__home" href="/">qilmeg@qilmegd</a>
+  <span class="nav__sep" aria-hidden="true">:</span>
+
+  <ul class="nav__list">
+    {
+      items.map(({ href, label }) => (
+        <li>
+          <a href={href} aria-current={path.startsWith(href) ? 'page' : undefined}>
+            /{label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="lens" role="group" aria-label="View as">
+    <span class="lens__label" aria-hidden="true">--as</span>
+    <button type="button" data-lens-set="developer">developer</button>
+    <button type="button" data-lens-set="designer">designer</button>
+    <button type="button" data-lens-set="">all</button>
+  </div>
+</nav>
+
+<script>
+  const root = document.documentElement;
+
+  function paint() {
+    const active = root.dataset.lens ?? '';
+    document.querySelectorAll<HTMLButtonElement>('[data-lens-set]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(b.dataset.lensSet === active));
+    });
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-lens-set]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const next = b.dataset.lensSet ?? '';
+      if (next) {
+        root.dataset.lens = next;
+      } else {
+        delete root.dataset.lens;
+      }
+      try {
+        next ? localStorage.setItem('lens', next) : localStorage.removeItem('lens');
+      } catch (e) {
+        /* choice just won't survive a reload */
+      }
+      paint();
+    });
+  });
+
+  paint();
+</script>
+
+<style>
+  .nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0 0.5ch;
+    padding: 0.9rem var(--gutter);
+    font-size: var(--step--1);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-inset);
+  }
+
+  .nav__home {
+    color: var(--term-prompt);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .nav__sep {
+    color: var(--fg-muted);
+  }
+
+  .nav__list {
+    display: flex;
+    gap: 1.25ch;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav__list a {
+    color: var(--term-path);
+    text-decoration: none;
+  }
+
+  .nav__list a:hover {
+    text-decoration: underline;
+  }
+
+  .nav__list a[aria-current='page'] {
+    color: var(--fg);
+    text-decoration: underline;
+  }
+
+  .lens {
+    display: flex;
+    align-items: center;
+    gap: 0.75ch;
+    margin-left: auto;
+    padding-right: 3rem; /* clear of the fixed theme toggle */
+  }
+
+  .lens__label {
+    color: var(--fg-faint);
+  }
+
+  .lens button {
+    font: inherit;
+    color: var(--fg-muted);
+    background: none;
+    border: 0;
+    padding: 0.1em 0.3em;
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+
+  .lens button:hover {
+    color: var(--fg);
+  }
+
+  .lens button[aria-pressed='true'] {
+    color: var(--accent);
+    background: var(--accent-faint);
+  }
+
+  @media (max-width: 44rem) {
+    .lens {
+      margin-left: 0;
+      width: 100%;
+      padding-top: 0.5rem;
+      padding-right: 0;
+    }
+  }
+</style>

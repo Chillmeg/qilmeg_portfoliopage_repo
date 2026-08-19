@@ -1,0 +1,193 @@
+/* ---------------------------------------------------------------------------
+   Terminal palette — light and dark.
+
+   Light is deliberately a *paper-and-ink* terminal (a printed listing), not a
+   bleached copy of the dark theme. Both share one accent family so the site
+   reads as a single system either way round.
+
+   Every colour is defined once here as a token. Components reference tokens
+   only — no literal hex values outside this file, or the toggle will develop
+   holes.
+   --------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+
+  --bg: #f2efe6;
+  --bg-inset: #e7e1d3;
+  --bg-raised: #fbf9f4;
+
+  --fg: #23211d;
+  --fg-muted: #6a645b;
+  --fg-faint: #9a9287;
+
+  --accent: #1d6b47;
+  --accent-fg: #ffffff;
+  --accent-faint: #d6e5dc;
+
+  --border: #cec6b4;
+  --border-strong: #a89f8b;
+
+  --selection: #cfe3d7;
+}
+
+/* System preference is dark — unless the visitor explicitly chose light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: #0e100f;
+    --bg-inset: #171a18;
+    --bg-raised: #1d211f;
+
+    --fg: #d6dbd6;
+    --fg-muted: #8b938c;
+    --fg-faint: #5d645e;
+
+    --accent: #5fd39a;
+    --accent-fg: #0e100f;
+    --accent-faint: #1b2f26;
+
+    --border: #2a2f2c;
+    --border-strong: #3d4441;
+
+    --selection: #1f4536;
+  }
+}
+
+/* Explicit choice always wins, in both directions. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0e100f;
+  --bg-inset: #171a18;
+  --bg-raised: #1d211f;
+
+  --fg: #d6dbd6;
+  --fg-muted: #8b938c;
+  --fg-faint: #5d645e;
+
+  --accent: #5fd39a;
+  --accent-fg: #0e100f;
+  --accent-faint: #1b2f26;
+
+  --border: #2a2f2c;
+  --border-strong: #3d4441;
+
+  --selection: #1f4536;
+}
+
+/* --------------------------------------------------------------------------
+   Non-colour tokens
+   -------------------------------------------------------------------------- */
+
+:root {
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono',
+    'Fira Code', Menlo, Consolas, monospace;
+
+  /* Fluid type — no fixed character-width column, so a phone never has to
+     scroll sideways to read a line. */
+  --step--1: clamp(0.78rem, 0.74rem + 0.18vw, 0.88rem);
+  --step-0: clamp(0.92rem, 0.87rem + 0.24vw, 1.05rem);
+  --step-1: clamp(1.15rem, 1.02rem + 0.6vw, 1.5rem);
+  --step-2: clamp(1.5rem, 1.22rem + 1.3vw, 2.4rem);
+
+  --measure: 68ch;
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2.5rem);
+  --radius: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Respect the OS setting for people who get motion sick, site-wide. */
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 0.2em;
+}
+
+/* Visible keyboard focus everywhere. A terminal aesthetic is no excuse for
+   losing the focus ring. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 0.5em 1em;
+  background: var(--accent);
+  color: var(--accent-fg);
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Terminal chrome tokens
+
+   These drive the window frame. Kept here with everything else so the frame
+   themes along with the rest of the site rather than drifting.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --term-bg: var(--bg-raised);
+  --term-bar: var(--bg-inset);
+  --term-border: var(--border);
+  --term-prompt: var(--accent);
+  --term-path: #7a6fb0;
+  --term-comment: var(--fg-faint);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --term-path: #9d8ee0;
+  }
+}
+
+:root[data-theme='dark'] {
+  --term-path: #9d8ee0;
+}

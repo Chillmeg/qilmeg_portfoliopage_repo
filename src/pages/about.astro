@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Terminal from '../components/Terminal.astro';
+import Line from '../components/Line.astro';
+---
+
+<Base title="About — Qilmeg Doudatcz">
+  <Nav />
+  <div class="page">
+    <Terminal title="qilmeg@qilmegd: ~/about">
+      <Line cmd>cat about.md</Line>
+      <Line comment>TODO — Qilmeg, write this bit.</Line>
+      <div class="spacer"></div>
+      <Line cmd>cat contact.md</Line>
+      <Line comment>TODO — email, GitHub, wherever else you want people to land.</Line>
+      <Line cursor />
+    </Terminal>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding: var(--gutter);
+  }
+
+  .spacer {
+    height: 1.2em;
+  }
+</style>

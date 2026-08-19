@@ -1,0 +1,81 @@
+---
+interface Props {
+  /** Text in the window title bar — conventionally user@host: path */
+  title?: string;
+  /** Drop the max-width cap for pages that need the full viewport */
+  wide?: boolean;
+}
+
+const { title = 'qilmeg@qilmegd: ~', wide = false } = Astro.props;
+---
+
+<div class:list={['term', { 'term--wide': wide }]}>
+  <div class="term__bar">
+    <span class="term__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="term__title">{title}</span>
+  </div>
+  <div class="term__body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .term {
+    max-width: 72ch;
+    margin: 0 auto;
+    background: var(--term-bg);
+    border: 1px solid var(--term-border);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.25);
+  }
+
+  .term--wide {
+    max-width: 110ch;
+  }
+
+  .term__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.8rem;
+    background: var(--term-bar);
+    border-bottom: 1px solid var(--term-border);
+  }
+
+  .term__dots {
+    display: flex;
+    gap: 0.4rem;
+    flex: none;
+  }
+
+  .term__dots i {
+    width: 0.66rem;
+    height: 0.66rem;
+    border-radius: 50%;
+    background: var(--border-strong);
+    opacity: 0.7;
+  }
+
+  .term__title {
+    font-size: var(--step--1);
+    color: var(--fg-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .term__body {
+    padding: 1.1rem 1.1rem 1.5rem;
+    /* Long output scrolls inside the window, never the page sideways. */
+    overflow-x: auto;
+  }
+
+  @media (max-width: 34rem) {
+    .term {
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+    }
+  }
+</style>

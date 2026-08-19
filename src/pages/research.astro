@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Terminal from '../components/Terminal.astro';
+import ProjectList from '../components/ProjectList.astro';
+---
+
+<Base title="Research — Qilmeg Doudatcz">
+  <Nav />
+  <div class="page">
+    <Terminal title="qilmeg@qilmegd: ~/research" wide>
+      <ProjectList section="research" />
+    </Terminal>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding: var(--gutter);
+  }
+</style>
