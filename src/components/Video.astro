@@ -1,0 +1,80 @@
+---
+interface Props {
+  /** Path under public/, e.g. /video/carespace-demo.mp4 */
+  src: string;
+  /** Optional still shown before the first frame decodes */
+  poster?: string;
+  caption?: string;
+  /** Width/height ratio, e.g. "16 / 9". Defaults to the file's own. */
+  aspect?: string;
+}
+
+const { src, poster, caption, aspect } = Astro.props;
+---
+
+<figure class="vid" style={aspect ? `--aspect: ${aspect}` : undefined}>
+  <video
+    src={src}
+    poster={poster}
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    data-autoplay-video
+  >
+  </video>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  // Silent autoplay needs all four of muted/autoplay/loop/playsinline, and
+  // even then some browsers refuse. Where they do, surface controls rather
+  // than leaving a dead frame.
+  //
+  // Reduced-motion is treated as an explicit opt-out: looping video is exactly
+  // the kind of motion that setting exists to stop.
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document
+    .querySelectorAll<HTMLVideoElement>('[data-autoplay-video]')
+    .forEach((video) => {
+      if (reduced.matches) {
+        video.autoplay = false;
+        video.loop = false;
+        video.controls = true;
+        video.pause();
+        return;
+      }
+
+      // play() rejects when the browser blocks autoplay — fall back to controls.
+      video.play().catch(() => {
+        video.controls = true;
+      });
+    });
+</script>
+
+<style>
+  .vid {
+    margin: 0;
+    border: 1px solid var(--term-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #000;
+  }
+
+  .vid video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--aspect, auto);
+    object-fit: cover;
+  }
+
+  figcaption {
+    padding: 0.5em 0.7em;
+    font-size: var(--step--1);
+    color: var(--fg-muted);
+    background: var(--bg-inset);
+  }
+</style>

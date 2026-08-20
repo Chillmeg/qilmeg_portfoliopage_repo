@@ -1,0 +1,241 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Terminal from '../../components/Terminal.astro';
+import Line from '../../components/Line.astro';
+import Video from '../../components/Video.astro';
+import Embed from '../../components/Embed.astro';
+import YouTube from '../../components/YouTube.astro';
+import { projects } from '../../data/projects';
+
+export function getStaticPaths() {
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+
+// Eagerly globbed so galleries resolve at build time. Raster and SVG are split:
+// astro:assets optimises the former, and SVGs are already resolution
+// independent so they pass through untouched.
+const raster = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/projects/*/*.{jpeg,jpg,png,webp,avif}',
+  { eager: true },
+);
+const vector = import.meta.glob<string>('../../assets/projects/*/*.svg', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+
+const inThisProject = (p: string) => p.includes(`/projects/${project.slug}/`);
+
+const images = Object.keys(raster)
+  .filter(inThisProject)
+  .sort()
+  .map((k) => raster[k].default);
+
+const vectors = Object.keys(vector).filter(inThisProject).sort().map((k) => vector[k]);
+
+const hasMedia = (project.media?.length ?? 0) > 0;
+const hasImages = images.length + vectors.length > 0;
+const description = project.body?.[0]?.slice(0, 160);
+---
+
+<Base title={`${project.title} — Qilmeg Doudatcz`} description={description}>
+  <Nav />
+  <div class="page">
+    <Terminal title={`qilmeg@qilmegd: ~/work/${project.slug}`} wide>
+      <Line cmd>cat {project.slug}/README.md</Line>
+      <h1>{project.title}</h1>
+
+      {
+        project.meta && (
+          <ul class="meta">
+            {project.meta.map((m) => (
+              <li>
+                {m.href ? (
+                  <a href={m.href} rel="noopener">
+                    {m.text} ↗
+                  </a>
+                ) : (
+                  m.text
+                )}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      {project.body?.map((para) => <p class="para">{para}</p>)}
+
+      {
+        project.links && (
+          <ul class="links">
+            {project.links.map((l) => (
+              <li>
+                <a href={l.href} rel="noopener">
+                  <span class="links__label">{l.label}</span> ↗
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        hasMedia && (
+          <>
+            <div class="spacer" />
+            <Line cmd>play {project.slug}/media/</Line>
+            <div class="stack">
+              {project.media!.map((m) =>
+                m.kind === 'youtube' ? (
+                  <YouTube
+                    id={m.id}
+                    title={m.title}
+                    start={m.start}
+                    autoplay={m.autoplay}
+                    caption={m.caption}
+                  />
+                ) : m.kind === 'video' ? (
+                  <Video src={m.src} poster={m.poster} caption={m.caption} aspect={m.aspect} />
+                ) : (
+                  <Embed
+                    src={m.src}
+                    title={m.title}
+                    aspect={m.aspect}
+                    allow={m.allow}
+                    caption={m.caption}
+                  />
+                ),
+              )}
+            </div>
+          </>
+        )
+      }
+
+      {
+        hasImages && (
+          <>
+            <div class="spacer" />
+            <Line cmd>open {project.slug}/images/</Line>
+            <div class="stack">
+              {vectors.map((src) => (
+                <figure class="shot shot--vector">
+                  <img src={src} alt={`${project.title} diagram`} loading="lazy" />
+                </figure>
+              ))}
+              {images.map((img) => (
+                <figure class="shot">
+                  <Image
+                    src={img}
+                    alt={project.title}
+                    widths={[480, 900, 1400]}
+                    sizes="(max-width: 48rem) 100vw, min(110ch, 90vw)"
+                    loading="lazy"
+                  />
+                </figure>
+              ))}
+            </div>
+          </>
+        )
+      }
+
+      <div class="spacer"></div>
+      <p class="back"><a href="/work/">← cd ../</a></p>
+    </Terminal>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding: var(--gutter);
+  }
+
+  h1 {
+    font-size: var(--step-1);
+    font-weight: 600;
+    margin: 0.3em 0 0.5em;
+    max-width: 40ch;
+  }
+
+  .meta {
+    list-style: none;
+    margin: 0 0 1.2em;
+    padding: 0 0 0 1.5ch;
+    border-left: 2px solid var(--border);
+    color: var(--fg-muted);
+    font-size: var(--step--1);
+  }
+
+  .meta li {
+    margin-bottom: 0.15em;
+  }
+
+  .para {
+    margin: 0 0 1em;
+    max-width: 74ch;
+  }
+
+  .links {
+    list-style: none;
+    margin: 0 0 0.5em;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em 1.5em;
+  }
+
+  .links a {
+    text-decoration: none;
+  }
+
+  .links__label {
+    text-decoration: underline;
+    text-decoration-color: var(--accent-faint);
+  }
+
+  .spacer {
+    height: 1.6em;
+  }
+
+  .stack {
+    display: grid;
+    gap: 1.2rem;
+    margin: 0.8em 0 0;
+  }
+
+  /* Images are the point on these pages, so each gets its own framed window
+     rather than being crammed into a thumbnail grid. */
+  .shot {
+    margin: 0;
+    border: 1px solid var(--term-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-inset);
+  }
+
+  .shot :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .shot--vector img {
+    padding: 1.5rem;
+    background: var(--bg-raised);
+  }
+
+  .back a {
+    color: var(--fg-muted);
+    text-decoration: none;
+  }
+
+  .back a:hover {
+    color: var(--accent);
+  }
+</style>

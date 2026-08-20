@@ -2,14 +2,99 @@
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import Terminal from '../components/Terminal.astro';
-import ProjectList from '../components/ProjectList.astro';
+import Line from '../components/Line.astro';
+
+// Transcribed from assets_web/01_Reference/research.md. Keep that file the
+// source of truth and re-sync by hand — it's a page's worth of citations, not
+// enough to justify a markdown pipeline.
+const publications = [
+  {
+    text: 'Doudatcz, Q., & Nagakura, N. (2026). Designing AI to design experiment for studying humans in spatial design: framework and case study.',
+    venue: 'Paper accepted, ACADIA 2026.',
+  },
+  {
+    text: 'Doudatcz, Q., & Nagakura, N. (2026). Morphic Memory: A crowdsourced vision-language framework for documenting vernacular architectural intelligence.',
+    venue: 'Abstract accepted, SiGraDi 2026.',
+  },
+  {
+    text: 'Ataman, B., Gallardo, R., Doudatcz, Q. (2026). Affective translation: Emotional engagement with textile soft robots across physical and augmented embodiments.',
+    venue: 'HCI International 2026 Posters (pp. 3–12). Springer.',
+    href: 'https://doi.org/10.1007/978-3-032-30819-1_1',
+  },
+  {
+    text: 'Gallardo, R., Doudatcz, Q., Goldstein, G., Sarimehmetoglu, I., Mutis, S., Kyaw, A. H., Lin, A., Emmerling, C., Ataman, B., & Tibbits, S. (2026). Context aware AI assistant and AR interface for lunar extravehicular activity (EVA) procedural guidance.',
+    venue: "SIGGRAPH '26 Conference Posters. ACM.",
+    href: 'https://doi.org/10.1145/3799825.3818743',
+  },
+  {
+    text: 'Ataman, B., Gallardo, R., & Doudatcz, Q. (2025). Affective translation: Material and virtual embodiments of kinetic textile robots.',
+    venue: 'arXiv:2601.11543 [cs.HC].',
+    href: 'https://doi.org/10.48550/arXiv.2601.11543',
+  },
+  {
+    text: 'Doudatcz, Q. (2025). Yertönts, the vertical world.',
+    venue: 'Dimensions, 38(1), 80.',
+  },
+  {
+    text: 'Tuladhar, S.*, Doudatcz, Q.*, & Samuelson, H. (in preparation). Measured thermal comfort performance of custom rice-husk insulation in cold climate emergency shelters.',
+    venue: 'Target journal: Building and Environment.',
+  },
+];
+
+const blogs = [
+  {
+    text: 'Erus, D., Liu, Y., & Doudatcz, Q. (2025). Multimodal scene representation learning for spatial and temporal understanding in video. MIT 6.7960 Final Project.',
+    href: 'https://chillmeg.github.io/25FA_MIT_67960_DL/',
+  },
+  {
+    text: 'RealityCapture Workflow Notes: Photogrammetry for Spatial Reconstruction',
+    href: 'https://upbeat-temper-37d.notion.site/264575007a8c80d2bc58c9b72de221bd?v=264575007a8c801b8f9e000c4986d3fc&source=copy_link',
+  },
+];
 ---
 
-<Base title="Research — Qilmeg Doudatcz">
+<Base
+  title="Research — Qilmeg Doudatcz"
+  description="Publications and writing by Qilmeg Doudatcz."
+>
   <Nav />
   <div class="page">
     <Terminal title="qilmeg@qilmegd: ~/research" wide>
-      <ProjectList section="research" />
+      <Line cmd>cat publications.bib</Line>
+      <ol class="refs">
+        {
+          publications.map((p) => (
+            <li>
+              <span class="refs__text">{p.text}</span>{' '}
+              <span class="refs__venue">{p.venue}</span>
+              {p.href && (
+                <>
+                  {' '}
+                  <a class="refs__link" href={p.href} rel="noopener">
+                    ↗
+                  </a>
+                </>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="spacer"></div>
+
+      <Line cmd>ls blogs/</Line>
+      <ul class="refs refs--plain">
+        {
+          blogs.map((b) => (
+            <li>
+              <a href={b.href} rel="noopener">
+                {b.text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <Line cursor />
     </Terminal>
   </div>
 </Base>
@@ -17,5 +102,38 @@ import ProjectList from '../components/ProjectList.astro';
 <style>
   .page {
     padding: var(--gutter);
+  }
+
+  .spacer {
+    height: 1.4em;
+  }
+
+  .refs {
+    margin: 0.5em 0 0;
+    padding-left: 3ch;
+    max-width: 82ch;
+  }
+
+  .refs li {
+    margin-bottom: 0.9em;
+    line-height: 1.55;
+  }
+
+  .refs::marker,
+  .refs li::marker {
+    color: var(--fg-faint);
+  }
+
+  .refs--plain {
+    list-style: none;
+    padding-left: 1.5ch;
+  }
+
+  .refs__venue {
+    color: var(--fg-muted);
+  }
+
+  .refs__link {
+    text-decoration: none;
   }
 </style>

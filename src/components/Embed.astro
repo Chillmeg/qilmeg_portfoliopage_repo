@@ -1,0 +1,64 @@
+---
+interface Props {
+  src: string;
+  /** Required — screen readers announce this as the frame's name. */
+  title: string;
+  /** Width/height ratio. 3DGS and WebGL viewers usually want something squarer. */
+  aspect?: string;
+  /** Extra permissions, e.g. "xr-spatial-tracking" for WebXR viewers. */
+  allow?: string;
+  caption?: string;
+}
+
+const {
+  src,
+  title,
+  aspect = '16 / 9',
+  allow = 'accelerometer; gyroscope; xr-spatial-tracking; fullscreen',
+  caption,
+} = Astro.props;
+---
+
+<figure class="embed" style={`--aspect: ${aspect}`}>
+  <div class="embed__frame">
+    <iframe
+      src={src}
+      title={title}
+      loading="lazy"
+      allow={allow}
+      allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .embed {
+    margin: 0;
+    border: 1px solid var(--term-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-inset);
+  }
+
+  .embed__frame {
+    position: relative;
+    aspect-ratio: var(--aspect);
+  }
+
+  .embed__frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  figcaption {
+    padding: 0.5em 0.7em;
+    font-size: var(--step--1);
+    color: var(--fg-muted);
+    background: var(--bg-inset);
+    border-top: 1px solid var(--term-border);
+  }
+</style>

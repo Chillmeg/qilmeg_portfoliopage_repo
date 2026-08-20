@@ -3,17 +3,108 @@ import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import Terminal from '../components/Terminal.astro';
 import Line from '../components/Line.astro';
+
+/* From 01_Reference/about.md. Each string is a paragraph. */
+const bio = [
+  'Qilmeg Doudatcz is a 3D vision developer and computational designer working at the intersection of computer vision, 3D reconstruction, and spatial computing. Her work spans web-based immersive visualizations, digital preservation for cultural heritage, and autonomous vehicle perception. By leveraging technologies like 3D Gaussian Splatting (3DGS), photogrammetry, and neural reconstruction, she builds intelligent end-to-end workflows to interpret and visualize complex spatial environments.',
+  'She is currently an SMArchS Computation student at MIT and a Software Developer Intern within the perception department at Glydways, where she contributes to autonomous transit network perception pipelines. She holds a Master of Architecture from the University of Michigan Taubman College of Architecture and a Bachelor of Civil Engineering from Southeast University in Nanjing, China.',
+];
+
+/* Rendered after the bio so the award links stay clickable. */
+const thesisNote = {
+  before: 'Her thesis at UMich, developed in dialogue with Mongolian communities in Ordos, was recognized with the ',
+  awards: [
+    {
+      text: 'Burton L Kampner Thesis Memorial Award',
+      href: 'https://taubmancollege.umich.edu/students/awards/master-of-architecture-awards/',
+    },
+    {
+      text: "RIBA President's Medals, Silver Medal category",
+      href: 'https://www.presidentsmedals.com/Entry-64931',
+    },
+  ],
+  after:
+    ' (2024). Across research and collaborative projects, she has built end-to-end workflows spanning LiDAR scanning, photogrammetry, XR environments, and digital fabrication.',
+};
+
+/*
+ * NOTE: the CV link still points at Cargo's file host. Once the Cargo account
+ * lapses that URL dies — put the PDF in public/ and switch this to /cv.pdf.
+ */
+const links = [
+  {
+    label: 'cv',
+    href: 'https://freight.cargo.site/m/U2861150552621205196884946879018/Qilmeg_Doudatcz_CV_Mar26.pdf',
+    text: 'Curriculum Vitae',
+  },
+  {
+    label: 'mit',
+    href: 'https://architecture.mit.edu/people/qilmeg-doudatcz',
+    text: 'MIT Profile Page',
+  },
+  { label: 'email', href: 'mailto:qlmg954@mit.edu', text: 'qlmg954@mit.edu' },
+  { label: 'github', href: 'https://github.com/Chillmeg', text: 'github.com/Chillmeg' },
+  {
+    label: 'linkedin',
+    href: 'https://www.linkedin.com/in/qilmegdoudatcz/',
+    text: 'in/qilmegdoudatcz',
+  },
+  {
+    label: 'instagram',
+    href: 'https://www.instagram.com/chillmeggg',
+    text: '@chillmeggg',
+  },
+];
 ---
 
-<Base title="About — Qilmeg Doudatcz">
+<Base
+  title="About — Qilmeg Doudatcz"
+  description="About Qilmeg Doudatcz — architecture, computation, XR, heritage."
+>
   <Nav />
   <div class="page">
     <Terminal title="qilmeg@qilmegd: ~/about">
       <Line cmd>cat about.md</Line>
-      <Line comment>TODO — Qilmeg, write this bit.</Line>
+      {bio.map((para) => <p class="para">{para}</p>)}
+      <p class="para">
+        {thesisNote.before}
+        {
+          thesisNote.awards.map((a, i) => (
+            <>
+              {i > 0 && ' and nominated for the '}
+              <a href={a.href} rel="noopener">
+                {a.text}
+              </a>
+            </>
+          ))
+        }
+        {thesisNote.after}
+      </p>
+
       <div class="spacer"></div>
-      <Line cmd>cat contact.md</Line>
-      <Line comment>TODO — email, GitHub, wherever else you want people to land.</Line>
+
+      <Line cmd>cat contact.txt</Line>
+      <dl class="links">
+        {
+          links.map((l) => (
+            <div class="links__row">
+              <dt>{l.label}</dt>
+              <dd>
+                <a href={l.href} rel="noopener">
+                  {l.text}
+                </a>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <div class="spacer"></div>
+
+      <Line cmd>ls ../</Line>
+      <p class="jump">
+        <a href="/work/">work/</a> <a href="/research/">research/</a>
+      </p>
       <Line cursor />
     </Terminal>
   </div>
@@ -24,7 +115,48 @@ import Line from '../components/Line.astro';
     padding: var(--gutter);
   }
 
+  .para {
+    margin: 0.5em 0 1em;
+    max-width: 68ch;
+  }
+
   .spacer {
-    height: 1.2em;
+    height: 1.4em;
+  }
+
+  .links {
+    margin: 0.4em 0 0;
+    padding-left: 1.5ch;
+  }
+
+  .links__row {
+    display: flex;
+    gap: 1ch;
+    margin-bottom: 0.25em;
+  }
+
+  .links dt {
+    color: var(--fg-faint);
+    min-width: 9ch;
+  }
+
+  .links dd {
+    margin: 0;
+  }
+
+  .jump {
+    display: flex;
+    gap: 2ch;
+    margin: 0.4em 0 0;
+    padding-left: 1.5ch;
+  }
+
+  .jump a {
+    color: var(--term-path);
+    text-decoration: none;
+  }
+
+  .jump a:hover {
+    text-decoration: underline;
   }
 </style>

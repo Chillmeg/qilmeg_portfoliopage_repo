@@ -1,23 +1,15 @@
 ---
 import Line from './Line.astro';
-import type { Project, Section } from '../data/projects';
 import { projects } from '../data/projects';
-
-interface Props {
-  section: Section;
-}
-
-const { section } = Astro.props;
-const items: Project[] = projects.filter((p) => p.section === section);
 ---
 
-<Line cmd>ls {section}/</Line>
+<Line cmd>ls work/</Line>
 
 <ul class="list">
   {
-    items.map((p) => (
+    projects.map((p) => (
       <li class="item" data-lens={p.lens.join(' ')}>
-        <a href={`/${p.section}/${p.slug}/`}>
+        <a href={`/work/${p.slug}/`}>
           <span class="item__mark" aria-hidden="true">
             →
           </span>
